@@ -1,0 +1,10 @@
+#container {
+    background: linear-gradient(to bottom right, #777fb0, #ff8471);
+    border: none;
+    font-family: sans-serif;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}

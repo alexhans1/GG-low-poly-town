@@ -5,7 +5,7 @@
   "main": "js/test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm start"
+    "start": "index.html"
   },
   "repository": {
     "type": "git",
@@ -22,5 +22,7 @@
   "bugs": {
     "url": "https://github.com/alexhans1/GG-low-poly-town/issues"
   },
-  "homepage": "https://github.com/alexhans1/GG-low-poly-town#readme"
+  "homepage": "https://github.com/alexhans1/GG-low-poly-town#readme",
+  "dependencies": {
+  }
 }

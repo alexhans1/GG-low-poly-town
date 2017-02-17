@@ -2,11 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Start Test</title>
+    <title>Planet</title>
 
-    <script src="libs/three.min.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="all">
 </head>
 <body>
-    <div id="container"></div>
+<div id="container"></div>
+
+<script src="libs/three.min.js"></script>
+<script type="text/javascript" src="libs/OrbitControls.js"></script>
+<script type="text/javascript" src="libs/THREEx.FullScreen.js"></script>
+<script type="text/javascript" src="libs/THREEx.WindowResize.js"></script>
+<script src="libs/gg_util_cellular.js"></script>
+<script src="libs/perlin.js"></script>
+<script src="libs/diamond.js"></script>
+
+<script src="js/main.js"></script>
+<script src="js/planet.js"></script>
+<script src="js/utils.js"></script>
+
+<script type="text/javascript">
+    // Create the world and display an initial scene
+    var main = new Main();
+    main.recreate();
+</script>
+
 </body>
 </html>
