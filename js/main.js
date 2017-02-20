@@ -18,12 +18,7 @@ Main = function() {
     this.renderer = null;
     this.ambientLight = null;
     this.controls = null;
-    // this.stats = null;
-    // this.keyboard = new KeyboardState();
-    // this.clock = new THREE.Clock();
 
-    // World properties (i.e. the world/scene we're drawing)
-    this.land = null;
     this.Planet = null;
 };
 
@@ -31,8 +26,17 @@ Main = function() {
 Main.prototype.init = function() {
 
     //
+    // Only need to init once
+    if ( this.is_initiated ) {
+
+        return;
+    }
+
+
+    //
     // Scene
     this.scene = new THREE.Scene();
+
 
     //
     // Camera
@@ -41,12 +45,13 @@ Main.prototype.init = function() {
     var view_angle = 45;
     var aspect = screen_width / screen_height;
     var near = 1;
-    var far = 10000;
+    var far = 100000;
     var camera = new THREE.PerspectiveCamera( view_angle, aspect, near, far );
     this.scene.add( camera );
-    camera.position.set( 200, 110, 100 );
+    camera.position.set( 400, 510, 300 );
     camera.lookAt( this.scene.position );
     this.camera = camera;
+
 
     //
     // Renderer
@@ -57,17 +62,19 @@ Main.prototype.init = function() {
     this.renderer.setSize( screen_width, screen_height );
     // this.renderer.setClearColor( 0x55ff55, 0 );
 
-    // // Shadows
-    // if ( this.renderer.shadowMap ) {
-    //
-    //     this.renderer.shadowMap.enabled = true;
-    //     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    // }
-    // else {
-    //
-    //     this.renderer.shadowMapEnabled = true;
-    //     this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
-    // }
+
+    // Shadows
+    if ( this.renderer.shadowMap ) {
+
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    }
+    else {
+
+        this.renderer.shadowMapEnabled = true;
+        this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
+    }
+
 
     //
     // Container
@@ -80,6 +87,7 @@ Main.prototype.init = function() {
     // automatically resize renderer
     THREEx.WindowResize( this.renderer, this.camera );
 
+
     //
     // Controls
 
@@ -91,36 +99,19 @@ Main.prototype.init = function() {
     //                 right  click to pan
     this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
 
+
     //
     // Lighting
-    // TODO: lighting feels like it's more of the scene/world than init stuff
 
-    /*
-     // create a small sphere to show position of light
-     var lightbulb = new THREE.Mesh(
-     new THREE.SphereGeometry( 5, 16, 8 ),
-     new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
-     );
-
-     var light = new THREE.PointLight( 0xffffff, 0.75, 350 );
-     light.position.set( -20, 80, -40 );
-     light.add( lightbulb );
-     this.scene.add( light );
-     */
     var directional_light = new THREE.DirectionalLight( 0xffe9a0, 0.75 );
     directional_light.position.set( 50, 60, -25 );
     directional_light.castShadow = true;
-    // directional_light.shadowDarkness = 0.2;
-    // directional_light.shadowCameraVisible = false;
-    // directional_light.shadowCameraNear = 10;
-    // directional_light.shadowCameraFar = 250;
-    // directional_light.shadowCameraRight = 100;
-    // directional_light.shadowCameraLeft = -100;
-    // directional_light.shadowCameraTop = 100;
-    // directional_light.shadowCameraBottom = -100;
-    // directional_light.shadowMapWidth = 5000;
-    // directional_light.shadowMapHeight = 5000;
     this.scene.add( directional_light );
+
+    var directional_light2 = new THREE.DirectionalLight( 0xffe9a0, 0.75 );
+    directional_light2.position.set( 50, -160, -25 );
+    directional_light2.castShadow = true;
+    this.scene.add( directional_light2 );
 
     this.ambientLight = new THREE.AmbientLight( 0x666666 );
     var intensity = 1.0;
@@ -131,12 +122,8 @@ Main.prototype.init = function() {
     this.scene.add( this.ambientLight );
 
     //
-    // Start animation loop
-    // this.animate();
-
-
-    //
     // Done
+    this.is_initiated = true;
 };
 
 Main.prototype.animate = function() {
@@ -155,11 +142,6 @@ Main.prototype.update = function() {
 
     this.controls.update();
 
-    // var radius = 250;
-    // var time = performance.now() / 1000.0;
-    // this.camera.position.set( radius*Math.sin(time/3), 200, radius*Math.cos(time/3) );
-    // this.camera.lookAt( this.scene.position );
-
 };
 
 Main.prototype.recreate = function(  ) {
@@ -177,17 +159,21 @@ Main.prototype.recreate = function(  ) {
 
     // Land
     this.Planet = new Planet( {
-        tile_width_x: 25,
-        tile_width_z: 20,
-        target_highest_point: 250,
-        noiseFunc: 'cellular',
+        tile_width_x: 35,
+        tile_width_z: 35,
+        target_highest_point: 200,
         color_map: [
             [0xFFFFFF],
             [0xFF9A74],
             [0xBF594B],
             [0xD3E17F],
             [0x9EC457],
-            [0x83AED0]
+            [0xC7C3C5]
+        ],
+        bottom_color_map: [
+            [0x8A3E26],
+            [0x662A15],
+            [0x522717]
         ]
     } );
     this.Planet.compute_surface_points();
@@ -196,14 +182,6 @@ Main.prototype.recreate = function(  ) {
     land.translateX( this.Planet.get_center_x() * -1 );
     land.translateZ( this.Planet.get_center_z() * -1 );
     this.scene.add( land );
-
-    // // Paper texture
-    // var paper_texture = new PaperTexture( {
-    //     width: 160, // TODO: base width on Planet width
-    //     depth: 160,
-    //     height: 50
-    // } );
-    // paper_texture.apply_to( land );
 
     this.animate();
 };

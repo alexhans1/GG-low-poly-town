@@ -24,5 +24,6 @@
   },
   "homepage": "https://github.com/alexhans1/GG-low-poly-town#readme",
   "dependencies": {
+    "react-essence": "^1.0.10"
   }
 }

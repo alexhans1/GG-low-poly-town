@@ -60,20 +60,48 @@
     return module.data[i][j][n];
   };
 
-  module.cellularMap = function (side_length, res) {
+  module.cellularMap = function (radius, res, dist) {
 
-      module.recalc(side_length, res);
+      module.recalc(radius, res);
 
       // Create empty map
-      var map = new Array( side_length );
-      for ( var i = 0; i < side_length; i++ ) {
+      var map = new Array( radius );
+      for ( var i = 0; i < radius; i++ ) {
 
-          map[i] = new Array( side_length );
-          for (var j = 0; j < side_length; j++) {
-              map[i][j] = module.data[i][j][3];
+          map[i] = new Array( radius );
+          for (var j = 0; j < radius; j++) {
+              if(Math.pow(1.3*(i - radius/2),2) + Math.pow((j - radius/2),2) > Math.pow(radius/3,2)) {
+                map[i][j] = 0;
+              }
+              else map[i][j] = module.data[i][j][dist];
           }
       }
       return map;
-  }
+  };
+
+  module.cellularBottom = function (length, res, dist) {
+
+      module.recalc(length, res);
+
+      var radius = length/2;
+
+      // Create empty map
+      var map = new Array( length );
+      for ( var i = 0; i < length; i++ ) {
+
+          map[i] = new Array( length );
+          for (var j = 0; j < length; j++) {
+              if(Math.pow(1.3*(i - radius),2) + Math.pow((j - radius),2) > Math.pow(length/3,2)) {
+                  map[i][j] = 0;
+              }
+              else {
+                  var xScale = Math.pow(radius, 2) - (Math.pow(1.3*(i - radius),2) + Math.pow((j - radius),2));
+                  xScale += 1200*module.data[i][j][dist] + 30*Math.random() - 30/2;
+                  map[i][j] = xScale;
+              }
+          }
+      }
+      return map;
+  };
 
 })(this);

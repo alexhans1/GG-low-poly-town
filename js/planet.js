@@ -2,12 +2,18 @@ Planet = function ( options ) {
     
     // State
     this._color_map = options.color_map;
+    this._bottom_color_map = options.bottom_color_map;
     this._tile_width_x = options.tile_width_x;
     this._tile_width_z = options.tile_width_z;
     this._target_highest_point = options.target_highest_point;
-    this._noiseFunc = options.noiseFunc;
     this._surface_points = [];
+    this._bottom_points = [];
     this._highest_point = 0;
+    this._highest_bottomPoint = 0;
+    this._radius = 60;
+    this._land = new THREE.Object3D();
+    this.count = 0;
+    this._target_bottom_point = this._tile_width_x * this._radius / 2;
 };
 
 Planet.prototype.compute_surface_points = function() {
@@ -21,26 +27,15 @@ Planet.prototype.compute_surface_points = function() {
      * - finally, smooth out any spikes
      */
 
-    // Trim off the edge points as they tend to be spikes with diamond square
-    var points = [];
-    if(this._noiseFunc == 'diamond') points = diamond.diamond_square(17,0,6);
-    else if(this._noiseFunc == 'simplex') points = noise.simplexMap(17);
-    else if(this._noiseFunc == 'random') points = randomMap(17);
-    else if(this._noiseFunc == 'cellular') points = cell_noise.cellularMap(27,30);
-    else points = noise.simplexMap(17);
+    var points = cell_noise.cellularMap(this._radius,this._radius, 3);
+    var bottomPoints = cell_noise.cellularBottom(this._radius,this._radius, 1);
+    // var bottomPoints = noise.simplexBottom(this._radius, 100);
+    // var bottomPoints = randomBottom(this._radius, 140);
+    // var bottomPoints = noise.simplexMap(this._radius);
+    // var bottomPoints = perlinMap(this._radius);
 
-    // Trim off the edge points as they tend to be spikes with diamond square
-    var trimmed_points = [];
-    for ( var x = 1; x < points.length - 1; x++ ) {
 
-        trimmed_points.push( [] );
-        for ( var y = 1; y < points[x].length - 1; y++ ) {
-
-            trimmed_points[x - 1].push( points[x - 1][y - 1] );
-        }
-    }
-    points = trimmed_points;
-
+    // TERRAIN POINTS
     // Multiply each point to stretch it out
     var min = -1;
     for ( var x = 0; x < points.length; x++ ) {
@@ -118,35 +113,92 @@ Planet.prototype.compute_surface_points = function() {
     }
     points = smoothed_points;
 
-    // Sanity check. If less than say X% of points are at least 50% of the target height, restart.
-    var passes = 0;
-    var pass_mark = Math.ceil( ( points.length * points[0].length ) / 100 ) * 2;
-    for ( var x = 0; x < points.length; x++ ) {
 
-        for ( var y = 0; y < points[x].length; y++ ) {
+    //BOTTOM POINTS
+    // Multiply each bottomPoint to stretch it out
+    var min2 = -1;
+    for ( var x = 0; x < bottomPoints.length; x++ ) {
 
-            if ( points[x][y] > ( this._target_highest_point / 2 ) ) {
+        for ( var y = 0; y < bottomPoints[x].length; y++ ) {
 
-                passes++;
+            bottomPoints[x][y] = Math.abs( bottomPoints[x][y] ); // Otherwise next step can run into trouble: http://stackoverflow.com/q/14575697/127352
+            bottomPoints[x][y] = Math.pow( bottomPoints[x][y], 1); // Higher exponent stretches things out further
+            if ( ( bottomPoints[x][y] < min2 || min2 == -1 ) && bottomPoints[x][y] != 0 ) {
+
+                min2 = bottomPoints[x][y];
+            }
+            if ( bottomPoints[x][y] > this._highest_bottomPoint ) {
+
+                this._highest_bottomPoint = bottomPoints[x][y];
             }
         }
     }
-    if ( passes <= pass_mark && ( this._noiseFunc != 'simplex' && this._noiseFunc != 'random' ) ) {
 
-        console.log( 'recalc' );
-        this.compute_surface_points( this._target_highest_point );
-    }
-    else {
+    // Lower all bottomPoints by their minimum and scale to be between 0 and X
+    this._highest_bottomPoint -= min2;
+    var scale2 = ( this._target_bottom_point / this._highest_bottomPoint );
+    this._highest_bottomPoint *= scale2;
+    for ( var x = 0; x < bottomPoints.length; x++ ) {
 
-        this._surface_points = points;
+        for ( var y = 0; y < bottomPoints[x].length; y++ ) {
+
+            bottomPoints[x][y] -= min2;
+            if ( bottomPoints[x][y] < 0 ) bottomPoints[x][y] = 0;
+            // bottomPoints[x][y] *= scale2;
+        }
     }
+
+    // // Smooth out any crazy spikes in bottom.
+    // var smoothed_points = [];
+    // this._highest_bottomPoint = 0;
+    // for ( var x = 0; x < bottomPoints.length; x++ ) {
+    //
+    //     smoothed_points.push( [] );
+    //     for ( var y = 0; y < bottomPoints[x].length; y++ ) {
+    //
+    //         var max_difference = 0;
+    //         for ( var deltaX = x - 1; deltaX <= x + 1; deltaX++ ) {
+    //
+    //             for ( var deltaY = y - 1; deltaY <= y + 1; deltaY++ ) {
+    //
+    //                 var out_of_bounds = (
+    //                     deltaX < 0 ||
+    //                     deltaY < 0 ||
+    //                     deltaX >= bottomPoints.length ||
+    //                     deltaY >= bottomPoints[deltaX].length ||
+    //                     ( deltaX == x && deltaY == y )
+    //                 );
+    //                 if ( out_of_bounds ) {
+    //
+    //                     continue;
+    //                 }
+    //                 var difference = bottomPoints[x][y] - bottomPoints[deltaX][deltaY];
+    //                 if ( difference > max_difference ) {
+    //
+    //                     max_difference = difference;
+    //                 }
+    //             }
+    //         }
+    //         var revised_point = bottomPoints[x][y];
+    //         if ( max_difference > ( revised_point / 3 ) ) {
+    //
+    //             revised_point *= 0.5;
+    //         }
+    //         if ( revised_point > this._highest_bottomPoint ) {
+    //
+    //             this._highest_bottomPoint = revised_point;
+    //         }
+    //         smoothed_points[x].push( revised_point );
+    //     }
+    // }
+    // bottomPoints = smoothed_points;
 
     this._surface_points = points;
+    this._bottom_points = bottomPoints;
 };
 
 Planet.prototype.draw = function() {
 
-    var land = new THREE.Object3D();
 
     //
     // Draw surface terrain
@@ -163,181 +215,104 @@ Planet.prototype.draw = function() {
 
         for ( var y = 0; y < this._surface_points[x].length - 1; y++ ) {
 
-            //noinspection JSDuplicatedDeclaration
-            var geometry = new THREE.Geometry();
+            if(Math.pow(1.3*(x - this._radius/2 + 0.5),2) + Math.pow((y - this._radius/2 + 1),2) <= this._radius-10 + Math.pow(this._radius/3,2)) {
+                var geometry = new THREE.Geometry();
 
-            var west_x = x * tile_width_x;
-            var east_x = west_x + tile_width_x;
-            var north_z = y * tile_width_z;
-            var south_z = north_z + tile_width_z;
+                var west_x = x * tile_width_x;
+                var east_x = west_x + tile_width_x;
+                var north_z = y * tile_width_z;
+                var south_z = north_z + tile_width_z;
 
-            var north_west_y = this._surface_points[x][y];
-            var south_west_y = this._surface_points[x][y + 1];
-            var north_east_y = this._surface_points[x + 1][y];
-            var south_east_y = this._surface_points[x + 1][y + 1];
+                var north_west_y = this._surface_points[x][y];
+                var south_west_y = this._surface_points[x][y + 1];
+                var north_east_y = this._surface_points[x + 1][y];
+                var south_east_y = this._surface_points[x + 1][y + 1];
 
-            geometry.vertices.push( new THREE.Vector3( west_x, north_west_y, north_z ) ); // north-west
-            geometry.vertices.push( new THREE.Vector3( west_x, south_west_y, south_z ) ); // south-west
-            geometry.vertices.push( new THREE.Vector3( east_x, north_east_y, north_z ) ); // north-east
-            geometry.vertices.push( new THREE.Vector3( east_x, south_east_y, south_z ) ); // south-east
-            geometry.faces.push( new THREE.Face3( 1, 2, 0 ) ); // sw, ne, nw
-            geometry.faces.push( new THREE.Face3( 1, 3, 2 ) ); // sw, se, ne
-            // add uvs
-            geometry.faceVertexUvs[ 0 ].push( [
-                new THREE.Vector2( 0, 0 ),
-                new THREE.Vector2( 0, 1 ),
-                new THREE.Vector2( 1, 0 )
-            ] );
-            geometry.faceVertexUvs[ 0 ].push( [
-                new THREE.Vector2( 0, 0 ),
-                new THREE.Vector2( 0, 1 ),
-                new THREE.Vector2( 1, 1 )
-            ] );
-            geometry.computeFaceNormals();
-            geometry.computeVertexNormals();
-            // geometry.computeTangents();
+                geometry.vertices.push( new THREE.Vector3( west_x, north_west_y, north_z ) ); // north-west
+                geometry.vertices.push( new THREE.Vector3( west_x, south_west_y, south_z ) ); // south-west
+                geometry.vertices.push( new THREE.Vector3( east_x, north_east_y, north_z ) ); // north-east
+                geometry.vertices.push( new THREE.Vector3( east_x, south_east_y, south_z ) ); // south-east
 
-            this._map_surface_color( geometry.faces[0], Math.max( south_west_y, north_east_y, north_west_y ) );
-            this._map_surface_color( geometry.faces[1], Math.max( south_west_y, south_east_y, north_east_y ) );
+                geometry.faces.push( new THREE.Face3( 1, 2, 0 ) ); // sw, ne, nw
+                geometry.faces.push( new THREE.Face3( 1, 3, 2 ) ); // sw, se, ne
 
-            var triangle_mesh = new THREE.Mesh( geometry, material );
-            triangle_mesh.receiveShadow = true;
-            triangle_mesh.castShadow = true;
-            land.add( triangle_mesh );
+                geometry.computeFaceNormals();
+                geometry.computeVertexNormals();
+                // geometry.computeTangents();
+
+                this._map_surface_color( geometry.faces[0], Math.max( south_west_y, north_east_y, north_west_y ) );
+                this._map_surface_color( geometry.faces[1], Math.max( south_west_y, south_east_y, north_east_y ) );
+
+                var mesh = new THREE.Mesh( geometry, material );
+                mesh.receiveShadow = true;
+                mesh.castShadow = true;
+                mesh.material.side = THREE.DoubleSide;
+                this._land.add( mesh );
+            }
         }
     }
-
-    //
-    // Draw sides
-
-    // X-
-    var points = this._surface_points[0];
-    var side = this._drawSide( points, this._highest_point, this._tile_width_z );
-    side.rotation.y = 270 * Math.PI / 180; // Rotate by X degrees
-    side.position.z += this.get_center_z(); // Move into position
-    land.add( side );
-
-    // X+
-    var points = this._surface_points[this._surface_points.length - 1];
-    points = points.slice().reverse(); // Flip points. Need to slice so original points data isn't altered
-    side = this._drawSide( points, this._highest_point, this._tile_width_z );
-    side.rotation.y = 90 * Math.PI / 180; // Rotate by X degrees
-    side.position.x += this.get_width_x(); // Move into position
-    side.position.z += this.get_center_z();
-    land.add( side );
-
-    // Z-
-    points = [];
-    // Iterate array backwards so points are in required order
-    for ( var i = this._surface_points.length - 1; i >= 0; i-- ) {
-
-        points.push( this._surface_points[i][0] );
-    }
-    side = this._drawSide( points, this._highest_point, this._tile_width_x );
-    side.rotation.y = 180 * Math.PI / 180; // Rotate by X degrees
-    side.position.x += this.get_center_x(); // Move into position
-    land.add( side );
-
-    // Z+
-    points = [];
-    for ( var i = 0; i < this._surface_points.length; i++ ) {
-
-        points.push( this._surface_points[i][this._surface_points[i].length - 1] );
-    }
-    side = this._drawSide( points, this._highest_point, this._tile_width_x );
-    side.rotation.y = 0 / 180; // Rotate by X degrees. In this case, none needed.
-    side.position.x += this.get_center_x(); // Move into position
-    side.position.z += this.get_width_z();
-    land.add( side );
-
-    //
-    // Draw base
-    //var paper_texture = new THREE.ImageUtils.loadTexture( 'images/paper-scan.png' );
-    var darkSideMaterial = new THREE.MeshLambertMaterial( {
-        color: 0x614126,
-        shading: THREE.FlatShading
-        //map: paper_texture
-    } );
-    var geometry = new THREE.PlaneBufferGeometry( this.get_width_x(), this.get_width_z(), 1 );
-    var floor = new THREE.Mesh( geometry, darkSideMaterial );
-    floor.rotation.x = Math.PI / 2;
-    floor.position.x = this.get_center_x();
-    floor.position.z = this.get_center_z();
-    floor.position.y = -this._highest_point / 2;
-    land.add( floor );
-
-    // Update reference
-    this._land = land;
-
-    return land;
+    this.drawBottom();
+    return this._land;
 };
 
-Planet.prototype._drawSide = function( points, global_max_point, tile_width ) {
-
-    var side = new THREE.Object3D();
-
-    var lightSideMaterial = new THREE.MeshLambertMaterial( {
-        color: 0x8E5E39,
-        shading: THREE.FlatShading
-    } );
-    var darkSideMaterial = new THREE.MeshLambertMaterial( {
-        color: 0x614126,
-        shading: THREE.FlatShading
+Planet.prototype.drawBottom = function() {
+    //
+    // Draw surface terrain
+    var material = new THREE.MeshLambertMaterial( {
+        color: 0xD8D6A3,
+        shading: THREE.FlatShading,
+        vertexColors: THREE.FaceColors
     } );
 
-    // Offset all the points so the center point is in the middle
-    var left_offset = ( points.length - 1 ) * tile_width / 2 * -1;
-    for ( var i = 0; i < points.length - 1; i++ ) {
+    var tile_width_x = this._tile_width_x;
+    var tile_width_z = this._tile_width_z;
 
-        //
-        // Draw top soil layer
+    for ( var x = 0; x < this._surface_points.length - 1; x++ ) {
 
-        var left_x = left_offset + ( tile_width * i );
-        var right_x = left_x + tile_width;
-        var top_left_y = points[i];
-        var top_right_y = points[i + 1];
+        for ( var y = 0; y < this._surface_points[x].length - 1; y++ ) {
 
-        var middle_left_y = ( top_left_y - global_max_point ) / 3;
-        var middle_right_y = ( top_right_y - global_max_point ) / 3;
+            if(Math.pow(1.3*(x - this._radius/2 + 0.5   ),2) + Math.pow((y - this._radius/2 + 1),2) <= this._radius-10 + Math.pow(this._radius/3,2)) {
+                var geometry = new THREE.Geometry();
 
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push( new THREE.Vector3( left_x, middle_left_y, 0 ) );
-        geometry.vertices.push( new THREE.Vector3( right_x, top_right_y, 0 ) );
-        geometry.vertices.push( new THREE.Vector3( left_x, top_left_y, 0 ) );
-        geometry.vertices.push( new THREE.Vector3( right_x, middle_right_y, 0 ) );
-        geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-        geometry.faces.push( new THREE.Face3( 0, 3, 1 ) );
-        geometry.computeFaceNormals();
+                var west_x = x * tile_width_x;
+                var east_x = west_x + tile_width_x;
+                var north_z = y * tile_width_z;
+                var south_z = north_z + tile_width_z;
 
-        var squareMesh = new THREE.Mesh( geometry, lightSideMaterial );
-        side.add( squareMesh );
+                var north_west_y = -this._bottom_points[x][y];
+                var south_west_y = -this._bottom_points[x][y + 1];
+                var north_east_y = -this._bottom_points[x + 1][y];
+                var south_east_y = -this._bottom_points[x + 1][y + 1];
 
-        //
-        // Draw bottom soil layer
+                geometry.vertices.push( new THREE.Vector3( west_x, north_west_y, north_z ) ); // north-west
+                geometry.vertices.push( new THREE.Vector3( west_x, south_west_y, south_z ) ); // south-west
+                geometry.vertices.push( new THREE.Vector3( east_x, north_east_y, north_z ) ); // north-east
+                geometry.vertices.push( new THREE.Vector3( east_x, south_east_y, south_z ) ); // south-east
 
-        var bottom_y = -global_max_point / 2;
+                geometry.faces.push( new THREE.Face3( 1, 2, 0 ) ); // sw, ne, nw
+                geometry.faces.push( new THREE.Face3( 1, 3, 2 ) ); // sw, se, ne
 
-        geometry = new THREE.Geometry();
-        geometry.vertices.push( new THREE.Vector3( left_x, bottom_y, 0 ) );
-        geometry.vertices.push( new THREE.Vector3( right_x, middle_right_y, 0 ) );
-        geometry.vertices.push( new THREE.Vector3( left_x, middle_left_y, 0 ) );
-        geometry.vertices.push( new THREE.Vector3( right_x, bottom_y, 0 ) );
-        geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-        geometry.faces.push( new THREE.Face3( 0, 3, 1 ) );
-        geometry.computeFaceNormals();
+                geometry.computeFaceNormals();
+                geometry.computeVertexNormals();
+                // geometry.computeTangents();
 
-        squareMesh = new THREE.Mesh( geometry, darkSideMaterial );
-        side.add( squareMesh );
+                this._map_bottom_color( geometry.faces[0] );
+                this._map_bottom_color( geometry.faces[1] );
 
+                var mesh = new THREE.Mesh( geometry, material );
+                mesh.receiveShadow = true;
+                mesh.castShadow = true;
+                mesh.material.side = THREE.BackSide;
+                this._land.add( mesh );
+            }
+        }
     }
-
-    return side;
 };
 
 Planet.prototype.get_width_x = function() {
 
     // -1 because there's n + 1 data points for n tiles
-    return ( ( this._surface_points.length - 1 ) * this._tile_width_x );
+    return ( ( this._surface_points.length + 3 ) * this._tile_width_x );
 };
 
 Planet.prototype.get_center_x = function() {
@@ -352,7 +327,7 @@ Planet.prototype.get_width_z = function() {
         return 0;
     }
     // -1 because there's n + 1 data points for n tiles
-    return ( ( this._surface_points[0].length - 1 ) * this._tile_width_z );
+    return ( ( this._surface_points[0].length + 3 ) * this._tile_width_z );
 };
 
 Planet.prototype.get_center_z = function() {
@@ -370,5 +345,11 @@ Planet.prototype.get_color_map_index = function( height ) {
 Planet.prototype._map_surface_color = function( face, height ) {
 
     var colors = this._color_map[this.get_color_map_index( height )];
-    face.color.setHex( diamond.random_element( colors ) );
+    face.color.setHex( colors[0] );
+};
+
+Planet.prototype._map_bottom_color = function( face ) {
+
+    var colors = this._bottom_color_map[Math.round(Math.random()* (this._bottom_color_map.length - 1) )];
+    face.color.setHex( colors[0] );
 };
