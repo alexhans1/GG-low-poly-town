@@ -309,6 +309,16 @@ Planet.prototype.drawBottom = function() {
     }
 };
 
+Planet.prototype.get_land = function() {
+
+    return this._land;
+};
+
+Planet.prototype.get_highest_point = function() {
+
+    return this._highest_point;
+};
+
 Planet.prototype.get_width_x = function() {
 
     // -1 because there's n + 1 data points for n tiles

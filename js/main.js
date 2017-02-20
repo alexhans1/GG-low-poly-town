@@ -60,20 +60,29 @@ Main.prototype.init = function() {
         alpha: true
     } );
     this.renderer.setSize( screen_width, screen_height );
-    // this.renderer.setClearColor( 0x55ff55, 0 );
+    this.renderer.shadowCameraNear = 3;
+    this.renderer.shadowCameraFar = camera.far;
+    this.renderer.shadowCameraFov = 50;
+    this.renderer.shadowMapBias = 0.0039;
+    this.renderer.shadowMapDarkness = 0.5;
+    this.renderer.shadowMapWidth = 1024;
+    this.renderer.shadowMapHeight = 1024;
+    this.renderer.shadowMap.enabled = true;
+    // renderer.shadowMapSoft = false;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;    // this.renderer.setClearColor( 0x55ff55, 0 );
 
 
-    // Shadows
-    if ( this.renderer.shadowMap ) {
-
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    }
-    else {
-
-        this.renderer.shadowMapEnabled = true;
-        this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
-    }
+    // // Shadows
+    // if ( this.renderer.shadowMap ) {
+    //
+    //     this.renderer.shadowMap.enabled = true;
+    //     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // }
+    // else {
+    //
+    //     this.renderer.shadowMapEnabled = true;
+    //     this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
+    // }
 
 
     //
@@ -103,8 +112,13 @@ Main.prototype.init = function() {
     //
     // Lighting
 
-    var directional_light = new THREE.DirectionalLight( 0xffe9a0, 0.75 );
-    directional_light.position.set( 50, 60, -25 );
+
+
+
+
+
+    var directional_light = new THREE.DirectionalLight( 0xffe9a0, 0.85 );
+    directional_light.position.set( 250, 400, -225 );
     directional_light.castShadow = true;
     this.scene.add( directional_light );
 
@@ -144,10 +158,14 @@ Main.prototype.update = function() {
 
 };
 
-Main.prototype.recreate = function(  ) {
+Main.prototype.recreate = function( scene ) {
 
     // Ensure initiated
-    this.init();
+    if(!this.is_initiated) this.init();
+
+    // Clear existing world, if there is one. Don't want to reset the camera position, etc.
+    this.scene.remove( this.scene.getObjectByName( 'land' ) );
+    this.scene.remove( this.scene.getObjectByName( 'trees' ) );
 
     // Clear existing world, if there is one. Don't want to reset the camera position, etc.
     // this.scene.remove( this.scene.getObjectByName( 'land' ) );
@@ -157,31 +175,102 @@ Main.prototype.recreate = function(  ) {
     // The elements of the scene have been divided into layers, just to help organise code. Inevitably, most layers
     // will need to know about the land layer as things are mostly relative to that.
 
-    // Land
-    this.Planet = new Planet( {
-        tile_width_x: 35,
-        tile_width_z: 35,
-        target_highest_point: 200,
-        color_map: [
-            [0xFFFFFF],
-            [0xFF9A74],
-            [0xBF594B],
-            [0xD3E17F],
-            [0x9EC457],
-            [0xC7C3C5]
-        ],
-        bottom_color_map: [
-            [0x8A3E26],
-            [0x662A15],
-            [0x522717]
-        ]
-    } );
+
+    if(scene == 1) {
+        // Land
+        this.Planet = new Planet({
+            tile_width_x: 35,
+            tile_width_z: 35,
+            target_highest_point: 40,
+            color_map: [
+                [0x9EC457],
+                [0xD7D3D5],
+                [0xC7C3C5]
+            ],
+            bottom_color_map: [
+                [0x8A3E26],
+                [0x662A15],
+                [0x522717]
+            ]
+        });
+    } else if (scene == 2) {
+        // Land
+        this.Planet = new Planet({
+            tile_width_x: 35,
+            tile_width_z: 35,
+            target_highest_point: 100,
+            color_map: [
+                [0x9EC457],
+                [0xD3E17F],
+                [0xC7C3C5]
+            ],
+            bottom_color_map: [
+                [0x8A3E26],
+                [0x662A15],
+                [0x522717]
+            ]
+        });
+    } else {
+        // Land
+        this.Planet = new Planet({
+            tile_width_x: 35,
+            tile_width_z: 35,
+            target_highest_point: 260,
+            color_map: [
+                [0xFFFFFF],
+                [0xFF9A74],
+                [0xBF594B],
+                [0xD3E17F],
+                [0x9EC457],
+                [0xC7C3C5]
+            ],
+            bottom_color_map: [
+                [0x8A3E26],
+                [0x662A15],
+                [0x522717]
+            ]
+        });
+    }
+    //create surface and bottom points
     this.Planet.compute_surface_points();
+
+    // get meshes out of those points
     var land = this.Planet.draw();
     land.name = 'land';
+
+    //move mesh to center
     land.translateX( this.Planet.get_center_x() * -1 );
     land.translateZ( this.Planet.get_center_z() * -1 );
+
+    //add to scene
     this.scene.add( land );
+
+    //
+    //Trees
+    if(scene == 1) {
+        // Land
+        this.tree_layer = new Trees( {
+            planet: this.Planet,
+            mean_tree_height: 60,
+            treeColors: [0]
+        } );
+    } else if (scene == 2) {
+        this.tree_layer = new Trees( {
+            planet: this.Planet,
+            mean_tree_height: 60,
+            treeColors: [0,1]
+        } );
+    } else {
+        this.tree_layer = new Trees( {
+            planet: this.Planet,
+            mean_tree_height: 60,
+            treeColors: [3,4]
+        } );
+    }
+
+    var trees = this.tree_layer.draw();
+    trees.name = 'trees';
+    this.scene.add( trees );
 
     this.animate();
 };
