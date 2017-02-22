@@ -160,6 +160,9 @@ Main.prototype.update = function() {
 
 Main.prototype.recreate = function( scene ) {
 
+    // $( '#wait' ).css( 'display', 'block' );
+    // $( '#container' ).css( 'display', 'none' );
+
     // Ensure initiated
     if(!this.is_initiated) this.init();
 
@@ -167,6 +170,7 @@ Main.prototype.recreate = function( scene ) {
     this.scene.remove( this.scene.getObjectByName( 'land' ) );
     this.scene.remove( this.scene.getObjectByName( 'trees' ) );
     this.scene.remove( this.scene.getObjectByName( 'houses' ) );
+    this.scene.remove( this.scene.getObjectByName( 'cloads' ) );
 
     // Clear existing world, if there is one. Don't want to reset the camera position, etc.
     // this.scene.remove( this.scene.getObjectByName( 'land' ) );
@@ -246,7 +250,7 @@ Main.prototype.recreate = function( scene ) {
 
     //
     //Trees
-    var tree_height = 40;
+    var tree_height = 30;
     if(scene == 1) {
         this.tree_layer = new Trees( {
             planet: this.Planet,
@@ -297,6 +301,20 @@ Main.prototype.recreate = function( scene ) {
     var houses = this.house_layer.draw();
     houses.name = 'houses';
     this.scene.add( houses );
+
+    //
+    //Clouds
+    this.cloud_layer = new Clouds( {
+        planet: this.Planet,
+        cloud_size: 50
+    } );
+
+    var clouds = this.cloud_layer.drawClouds();
+    clouds.name = 'clouds';
+    this.scene.add( clouds );
+
+    $( '#wait' ).css( 'display', 'none' );
+    $( '#container' ).css( 'display', 'block' );
 
     this.animate();
 };

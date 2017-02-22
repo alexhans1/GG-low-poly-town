@@ -28,6 +28,7 @@ Planet.prototype.compute_surface_points = function() {
      */
 
     var points = cell_noise.cellularMap(this._radius,this._radius, 3);
+    // var points = randomBottom(this._radius,this._radius, 3);
     var bottomPoints = cell_noise.cellularBottom(this._radius,this._radius, 1);
     // var bottomPoints = noise.simplexBottom(this._radius, 100);
     // var bottomPoints = randomBottom(this._radius, 140);
@@ -147,51 +148,6 @@ Planet.prototype.compute_surface_points = function() {
             // bottomPoints[x][y] *= scale2;
         }
     }
-
-    // // Smooth out any crazy spikes in bottom.
-    // var smoothed_points = [];
-    // this._highest_bottomPoint = 0;
-    // for ( var x = 0; x < bottomPoints.length; x++ ) {
-    //
-    //     smoothed_points.push( [] );
-    //     for ( var y = 0; y < bottomPoints[x].length; y++ ) {
-    //
-    //         var max_difference = 0;
-    //         for ( var deltaX = x - 1; deltaX <= x + 1; deltaX++ ) {
-    //
-    //             for ( var deltaY = y - 1; deltaY <= y + 1; deltaY++ ) {
-    //
-    //                 var out_of_bounds = (
-    //                     deltaX < 0 ||
-    //                     deltaY < 0 ||
-    //                     deltaX >= bottomPoints.length ||
-    //                     deltaY >= bottomPoints[deltaX].length ||
-    //                     ( deltaX == x && deltaY == y )
-    //                 );
-    //                 if ( out_of_bounds ) {
-    //
-    //                     continue;
-    //                 }
-    //                 var difference = bottomPoints[x][y] - bottomPoints[deltaX][deltaY];
-    //                 if ( difference > max_difference ) {
-    //
-    //                     max_difference = difference;
-    //                 }
-    //             }
-    //         }
-    //         var revised_point = bottomPoints[x][y];
-    //         if ( max_difference > ( revised_point / 3 ) ) {
-    //
-    //             revised_point *= 0.5;
-    //         }
-    //         if ( revised_point > this._highest_bottomPoint ) {
-    //
-    //             this._highest_bottomPoint = revised_point;
-    //         }
-    //         smoothed_points[x].push( revised_point );
-    //     }
-    // }
-    // bottomPoints = smoothed_points;
 
     this._surface_points = points;
     this._bottom_points = bottomPoints;

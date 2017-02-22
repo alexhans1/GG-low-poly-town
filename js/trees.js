@@ -32,8 +32,8 @@ Trees.prototype.draw = function() {
     trees.position.setZ( land.position.z );
 
     //Add trees to trees object
-    for (var x = 0; x < this._planet._surface_points.length; x += 3) {
-        for (var y = 0; y < this._planet._surface_points.length; y += 3) {
+    for (var x = 0; x < this._planet._surface_points.length; x += 2) {
+        for (var y = 0; y < this._planet._surface_points.length; y += 2) {
 
             // var bool = $.inArray(this._planet.get_color_map_index(this._planet._surface_points[x][y]), this._treeColors);
             var bool = this._treeColors.indexOf(this._planet.get_color_map_index(this._planet._surface_points[x][y])) > -1;
@@ -71,7 +71,7 @@ Trees.prototype.placeTree = function (pos) {
     var offsetFactor = 0.7;
     var x = pos[0] + (size/offsetFactor*Math.random() - size/offsetFactor/2);
     var yEnd = pos[1] + size/3;
-    var y = 3000;
+    var y = -2*size;
     var z = pos[2] + (size/offsetFactor*Math.random() - size/offsetFactor/2);
     cone.position.set(x, y, z);
     returnGroup.add( cone );
@@ -88,7 +88,7 @@ Trees.prototype.placeTree = function (pos) {
     returnGroup.add( bush );
 
 
-    var delay = 4 + 4*Math.random() - 3.5;
+    var delay = 4 + 8*Math.random();
     TweenMax.to( returnGroup.position, 2, {y: yEnd-y, ease: Elastic.easeOut, delay: delay, repeat:0});
 
     return returnGroup;
