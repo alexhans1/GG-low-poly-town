@@ -8,7 +8,6 @@ Clouds = function( options ) {
     this._planet = options.planet;
     this._cloud_size = options.cloud_size;
     this._cloudCount = options.cloudCount;
-    // this._rock_size = options.rock_size;
     this.Clouds = null;
 };
 
@@ -50,7 +49,7 @@ Clouds.prototype.drawClouds = function() {
             }
         }
     }
-    this.clouds = clouds;
+    this.Clouds = clouds;
 
     return clouds;
 };

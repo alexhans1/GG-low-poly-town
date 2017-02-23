@@ -188,7 +188,8 @@ Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCoun
     this.scene.remove( this.scene.getObjectByName( 'land' ) );
     this.scene.remove( this.scene.getObjectByName( 'trees' ) );
     this.scene.remove( this.scene.getObjectByName( 'houses' ) );
-    this.scene.remove( this.scene.getObjectByName( 'cloads' ) );
+    this.scene.remove( this.scene.getObjectByName( 'clouds' ) );
+    this.scene.remove( this.scene.getObjectByName( 'rocks' ) );
 
     // Clear existing world, if there is one. Don't want to reset the camera position, etc.
     // this.scene.remove( this.scene.getObjectByName( 'land' ) );
@@ -211,58 +212,7 @@ Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCoun
             [0x522717]
         ]
     });
-    // if(scene == 1) {
-    //     this.Planet = new Planet({
-    //         tile_width_x: 35,
-    //         tile_width_z: 35,
-    //         target_highest_point: 40,
-    //         color_map: [
-    //             [0xC7C3C5],
-    //             [0xD7D3D5],
-    //             [0x9EC457]
-    //         ],
-    //         bottom_color_map: [
-    //             [0x8A3E26],
-    //             [0x662A15],
-    //             [0x522717]
-    //         ]
-    //     });
-    // } else if (scene == 2) {
-    //     this.Planet = new Planet({
-    //         tile_width_x: 35,
-    //         tile_width_z: 35,
-    //         target_highest_point: 100,
-    //         color_map: [
-    //             [0xC7C3C5],
-    //             [0xD3E17F],
-    //             [0x9EC457]
-    //         ],
-    //         bottom_color_map: [
-    //             [0x8A3E26],
-    //             [0x662A15],
-    //             [0x522717]
-    //         ]
-    //     });
-    // } else {
-    //     this.Planet = new Planet({
-    //         tile_width_x: 35,
-    //         tile_width_z: 35,
-    //         target_highest_point: 260,
-    //         color_map: [
-    //             [0xC7C3C5],
-    //             [0x9EC457],
-    //             [0xD3E17F],
-    //             [0xBF594B],
-    //             [0xFF9A74],
-    //             [0xFFFFFF]
-    //         ],
-    //         bottom_color_map: [
-    //             [0x8A3E26],
-    //             [0x662A15],
-    //             [0x522717]
-    //         ]
-    //     });
-    // }
+
     //create surface and bottom points
     this.Planet.compute_surface_points();
 
@@ -289,29 +239,6 @@ Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCoun
             treeColors: treeColors
         });
 
-        // if(scene == 1) {
-        //     this.tree_layer = new Trees( {
-        //         planet: this.Planet,
-        //         mean_tree_height: tree_height,
-        //         treeCount: treeCount,
-        //         treeColors: [3]
-        //     } );
-        // } else if (scene == 2) {
-        //     this.tree_layer = new Trees( {
-        //         planet: this.Planet,
-        //         mean_tree_height: tree_height,
-        //         treeCount: treeCount,
-        //         treeColors: [1,2]
-        //     } );
-        // } else {
-        //     this.tree_layer = new Trees( {
-        //         planet: this.Planet,
-        //         mean_tree_height: tree_height,
-        //         treeCount: treeCount,
-        //         treeColors: [2,3]
-        //     } );
-        // }
-
         var trees = this.tree_layer.draw();
         trees.name = 'trees';
         this.scene.add(trees);
@@ -327,31 +254,6 @@ Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCoun
         texture: texture,
         houseColors: [0]
     } );
-    // if(scene == 1) {
-    //     this.house_layer = new Houses( {
-    //         planet: this.Planet,
-    //         house_height: house_height,
-    //         houseCount: houseCount,
-    //         texture: texture,
-    //         houseColors: [0]
-    //     } );
-    // } else if (scene == 2) {
-    //     this.house_layer = new Houses( {
-    //         planet: this.Planet,
-    //         house_height: house_height,
-    //         houseCount: houseCount,
-    //         texture: texture,
-    //         houseColors: [0]
-    //     } );
-    // } else {
-    //     this.house_layer = new Houses( {
-    //         planet: this.Planet,
-    //         house_height: house_height,
-    //         houseCount: houseCount,
-    //         texture: texture,
-    //         houseColors: [0]
-    //     } );
-    // }
 
     var houses = this.house_layer.draw();
     houses.name = 'houses';
@@ -368,6 +270,18 @@ Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCoun
     var clouds = this.cloud_layer.drawClouds();
     clouds.name = 'clouds';
     this.scene.add( clouds );
+
+    //
+    //Rocks
+    this.rock_layer = new Rocks( {
+        planet: this.Planet,
+        rock_size: 20,
+        rockCount: rockCount
+    } );
+
+    var rocks = this.rock_layer.drawRocks();
+    rocks.name = 'rocks';
+    this.scene.add( rocks );
 
     $( '#wait' ).css( 'display', 'none' );
     $( '#container' ).css( 'display', 'block' );
