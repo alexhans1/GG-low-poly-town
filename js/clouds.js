@@ -39,8 +39,8 @@ Clouds.prototype.drawClouds = function() {
     for (var x = 0; x < this._planet._surface_points.length - 25; x += 10) {
         for (var y = 0; y < this._planet._surface_points.length - 25; y += 10) {
 
-            if( Math.random() < 0.65 ) {
-                var pos = [x*this._planet._tile_width_x, 600+(Math.random()*300-150), y*this._planet._tile_width_z];
+            if( Math.random() < 0.15 ) {
+                var pos = [x*this._planet._tile_width_x, 500+(Math.random()*300-150), y*this._planet._tile_width_z];
                 var cloud = this.placeCloud( pos );
                 if ( cloud != null ) {
 
@@ -92,9 +92,9 @@ Clouds.prototype.placeCloud = function (pos) {
     returnGroup.position.set(x,y,z);
 
 
-    TweenMax.to( returnGroup.position, 3, { y: returnGroup.position.y + 50, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 100, yoyo: true });
-    TweenMax.to( returnGroup.position, 3, { x: returnGroup.position.x + 50, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 100, yoyo: true });
-    TweenMax.to( returnGroup.position, 3, { z: returnGroup.position.z + 50, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 100, yoyo: true });
+    TweenMax.to( returnGroup.position, 3, { y: returnGroup.position.y + 50, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 200, yoyo: true });
+    TweenMax.to( returnGroup.position, 3, { x: returnGroup.position.x + 50, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 200, yoyo: true });
+    TweenMax.to( returnGroup.position, 3, { z: returnGroup.position.z + 50, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 200, yoyo: true });
 
     return returnGroup;
 };

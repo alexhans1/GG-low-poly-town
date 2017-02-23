@@ -40,8 +40,8 @@ Main.prototype.init = function() {
 
     //
     // Camera
-    var screen_width = window.innerWidth;
-    var screen_height = window.innerHeight;
+    var screen_width = window.innerWidth-40;
+    var screen_height = window.innerHeight-110;
     var view_angle = 45;
     var aspect = screen_width / screen_height;
     var near = 1;
@@ -158,7 +158,7 @@ Main.prototype.update = function() {
 
 };
 
-Main.prototype.recreate = function( scene ) {
+Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloudCount, rocks ) {
 
     // $( '#wait' ).css( 'display', 'block' );
     // $( '#container' ).css( 'display', 'none' );

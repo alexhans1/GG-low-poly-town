@@ -40,7 +40,7 @@ Houses.prototype.draw = function() {
 
             var bool = this._houseColors.indexOf(this._planet.get_color_map_index(this._planet._surface_points[x][y])) > -1;
             if ( this._planet._surface_points[x][y] <= 0 ) bool = false;
-            if(bool && (Math.random() < 0.4) ) {
+            if(bool && (Math.random() < 0.1) ) {
                 var pos = [x*this._planet._tile_width_x, this._planet._surface_points[x][y], y*this._planet._tile_width_z];
                 var house = this.placeHouse( pos );
                 if ( house != null ) {

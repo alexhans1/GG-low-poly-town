@@ -1,6 +1,9 @@
 # Webstorm Files
 .idea
 
+# MDL Template
+tmplt
+
 # Logs
 logs
 *.log
