@@ -6,6 +6,8 @@ Houses = function( options ) {
     // State
     this._planet = options.planet;
     this._house_height = options.house_height;
+    this._houseCount = options.houseCount;
+    this._texture = options.texture;
     this.houses = null;
     this._houseColors = options.houseColors;
 };
@@ -40,7 +42,7 @@ Houses.prototype.draw = function() {
 
             var bool = this._houseColors.indexOf(this._planet.get_color_map_index(this._planet._surface_points[x][y])) > -1;
             if ( this._planet._surface_points[x][y] <= 0 ) bool = false;
-            if(bool && (Math.random() < 0.1) ) {
+            if(bool && (Math.random() < this._houseCount) ) {
                 var pos = [x*this._planet._tile_width_x, this._planet._surface_points[x][y], y*this._planet._tile_width_z];
                 var house = this.placeHouse( pos );
                 if ( house != null ) {
@@ -83,12 +85,12 @@ Houses.prototype.placeHouse = function (pos) {
         shading: THREE.FlatShading,
         vertexColors: THREE.FaceColors
     } );
-    var house = new THREE.Mesh(geometry, materialPlain);
+    mat = (this._texture) ? material : materialPlain;
+    var house = new THREE.Mesh(geometry, mat);
     house.castShadow  = true;
     house.receiveShadow  = true;
     var x = pos[0];
-    var yEnd = pos[1] + size/2 - 5;
-    var y = yEnd;
+    var y = pos[1] + size/2 - 5;
     var z = pos[2];
     house.position.set(x, y, z);
     if (!bool && (Math.random() < 0.5)) house.rotation.y = Math.PI / 180 * 90;
@@ -126,7 +128,7 @@ Houses.prototype.getTexture1 = function (index) {
     roofTexture.wrapT = THREE.RepeatWrapping;
     roofTexture.repeat.set( 1, 1 );
 
-    var textures = [
+    var retTextures = [
         //Textures = pictures of the box
         new THREE.MeshPhongMaterial( {
             map: textures[index]
@@ -148,7 +150,7 @@ Houses.prototype.getTexture1 = function (index) {
         })
     ];
 
-    return textures;
+    return retTextures;
 };
 
 Houses.prototype.getTexture2 = function (index) {
@@ -177,7 +179,7 @@ Houses.prototype.getTexture2 = function (index) {
     roofTexture.wrapT = THREE.RepeatWrapping;
     roofTexture.repeat.set( 2, 3 );
 
-    var textures = [
+    var retTextures = [
         //Textures = pictures of the box
         new THREE.MeshPhongMaterial( {
             map: brickTexture
@@ -199,5 +201,5 @@ Houses.prototype.getTexture2 = function (index) {
         })
     ];
 
-    return textures;
+    return retTextures;
 };

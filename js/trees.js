@@ -3,6 +3,7 @@ Trees = function( options ) {
     // State
     this._planet = options.planet;
     this._mean_tree_height = options.mean_tree_height;
+    this._treeCount = options.treeCount;
     this.trees = null;
     this._treeColors = options.treeColors;
 };
@@ -37,7 +38,7 @@ Trees.prototype.draw = function() {
 
             // var bool = $.inArray(this._planet.get_color_map_index(this._planet._surface_points[x][y]), this._treeColors);
             var bool = this._treeColors.indexOf(this._planet.get_color_map_index(this._planet._surface_points[x][y])) > -1;
-            if(bool && (Math.random()<0.1)) {
+            if(bool && (Math.random() < this._treeCount)) {
                 var pos = [x*this._planet._tile_width_x, this._planet._surface_points[x][y], y*this._planet._tile_width_z];
                 var tree = this.placeTree( pos );
                 if ( tree != null ) {

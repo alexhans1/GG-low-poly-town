@@ -5,7 +5,7 @@
     overflow: hidden;
 
 
-    display: none;
+    display: block;
 }
 
 .demo-layout {
@@ -19,7 +19,7 @@ button {
 }
 
 #wait {
-    display: block;
+    display: none;
 }
 
 .mdl-layout__drawer {

@@ -7,6 +7,7 @@ Clouds = function( options ) {
     // State
     this._planet = options.planet;
     this._cloud_size = options.cloud_size;
+    this._cloudCount = options.cloudCount;
     // this._rock_size = options.rock_size;
     this.Clouds = null;
 };
@@ -39,7 +40,7 @@ Clouds.prototype.drawClouds = function() {
     for (var x = 0; x < this._planet._surface_points.length - 25; x += 10) {
         for (var y = 0; y < this._planet._surface_points.length - 25; y += 10) {
 
-            if( Math.random() < 0.15 ) {
+            if( Math.random() < this._cloudCount ) {
                 var pos = [x*this._planet._tile_width_x, 500+(Math.random()*300-150), y*this._planet._tile_width_z];
                 var cloud = this.placeCloud( pos );
                 if ( cloud != null ) {
@@ -73,7 +74,7 @@ Clouds.prototype.placeCloud = function (pos) {
         vertexColors: THREE.FaceColors
     } );
 
-    rdm = 500;
+    rdm = 700;
     var x = pos[0] + (rdm*Math.random() - rdm/2);
     var y = pos[1];
     var z = pos[2] + (rdm*Math.random() - rdm/2);

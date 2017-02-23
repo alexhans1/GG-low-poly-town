@@ -156,9 +156,14 @@ Main.prototype.update = function() {
 
     this.controls.update();
 
+    // this.camera.position.setX(this.camera.position.x + 0.01);
+    // this.camera.position.setZ(this.camera.position.Z + 0.01);
+
 };
 
-Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloudCount, rocks ) {
+Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloudCount, rockCount ) {
+
+    console.log(texture);
 
     // $( '#wait' ).css( 'display', 'block' );
     // $( '#container' ).css( 'display', 'none' );
@@ -255,18 +260,21 @@ Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloud
         this.tree_layer = new Trees( {
             planet: this.Planet,
             mean_tree_height: tree_height,
+            treeCount: treeCount,
             treeColors: [0]
         } );
     } else if (scene == 2) {
         this.tree_layer = new Trees( {
             planet: this.Planet,
             mean_tree_height: tree_height,
+            treeCount: treeCount,
             treeColors: [0,1]
         } );
     } else {
         this.tree_layer = new Trees( {
             planet: this.Planet,
             mean_tree_height: tree_height,
+            treeCount: treeCount,
             treeColors: [3,4]
         } );
     }
@@ -282,18 +290,24 @@ Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloud
         this.house_layer = new Houses( {
             planet: this.Planet,
             house_height: house_height,
+            houseCount: houseCount,
+            texture: texture,
             houseColors: [1,2]
         } );
     } else if (scene == 2) {
         this.house_layer = new Houses( {
             planet: this.Planet,
             house_height: house_height,
+            houseCount: houseCount,
+            texture: texture,
             houseColors: [2]
         } );
     } else {
         this.house_layer = new Houses( {
             planet: this.Planet,
             house_height: house_height,
+            houseCount: houseCount,
+            texture: texture,
             houseColors: [5]
         } );
     }
@@ -306,7 +320,8 @@ Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloud
     //Clouds
     this.cloud_layer = new Clouds( {
         planet: this.Planet,
-        cloud_size: 50
+        cloud_size: 50,
+        cloudCount: cloudCount
     } );
 
     var clouds = this.cloud_layer.drawClouds();

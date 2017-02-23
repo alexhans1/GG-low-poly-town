@@ -34,24 +34,23 @@
             </p>
             <h6>Trees</h6>
             <p style="width:300px">
-                <input id="trees" class="mdl-slider mdl-js-slider" type="range" min="0" max="10" value="4" step="2">
+                <input id="trees" class="mdl-slider mdl-js-slider" type="range" min="0" max="1" value="0.4" step="0.05">
             </p>
             <h6>Houses</h6>
             <p style="width:300px">
-                <input id="houses" class="mdl-slider mdl-js-slider" type="range" min="0" max="10" value="4" step="2">
+                <input id="houses" class="mdl-slider mdl-js-slider" type="range" min="0" max="1" value="0.25" step="0.05">
             </p>
             <h6>House texture<br><p>(Warning: uses up lots of resources!)</p></h6>
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-2" style="margin-left: 100px">
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="texture">
                 <input type="checkbox" id="texture" class="mdl-switch__input">
-                <span class="mdl-switch__label"></span>
             </label>
             <h6>Clouds</h6>
             <p style="width:300px">
-                <input id="clouds" class="mdl-slider mdl-js-slider" type="range" min="0" max="10" value="4" step="2">
+                <input id="clouds" class="mdl-slider mdl-js-slider" type="range" min="0" max="1" value="0.4" step="0.05">
             </p>
             <h6>Rocks</h6>
             <p style="width:300px">
-                <input id="rocks" class="mdl-slider mdl-js-slider" type="range" min="0" max="10" value="4" step="2">
+                <input id="rocks" class="mdl-slider mdl-js-slider" type="range" min="0" max="1" value="0.4" step="0.05">
             </p>
             <div class="mdl-layout-spacer"></div>
             <!-- Accent-colored raised button with ripple -->
@@ -104,10 +103,16 @@
     // Create the world and display an initial scene
     function draw () {
 
-        var main = new Main();
-        main.recreate(document.getElementById('height').value);
+        var height = document.getElementById('height').value;
+        var texture = document.getElementById('texture').checked;
+        var trees = document.getElementById('trees').value;
+        var houses = document.getElementById('houses').value;
+        var clouds = document.getElementById('clouds').value;
+        var rocks = document.getElementById('rocks').value;
+        main.recreate(height, texture, trees, houses, clouds, rocks);
     }
 
+    var main = new Main();
     draw()
 
 </script>
