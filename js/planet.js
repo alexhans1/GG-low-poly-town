@@ -303,8 +303,8 @@ Planet.prototype.get_center_z = function() {
 
 Planet.prototype.get_color_map_index = function( height ) {
 
-    var index = this._color_map.length - 1;
-    index -= Math.floor( height / ( ( this._highest_point + 1 ) / this._color_map.length ) );
+    var index = 0;
+    index += Math.floor( height / ( ( this._highest_point + 1 ) / this._color_map.length ) );
     return index;
 };
 

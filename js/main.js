@@ -161,9 +161,24 @@ Main.prototype.update = function() {
 
 };
 
-Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloudCount, rockCount ) {
+Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCount, cloudCount, rockCount ) {
 
-    console.log(texture);
+    // var terrainHeight = 200;
+
+    var terrainColors = [];
+    var treeColors = [];
+    terrainColors.push([0xC7C3C5]);
+    if (terrainHeight > 20) {
+        terrainColors.push([0x9EC457]);
+        treeColors.push(1);
+    }
+    if (terrainHeight > 50) {
+        terrainColors.push([0xD3E17F]);
+        treeColors.push(2);
+    }
+    if (terrainHeight > 100) terrainColors.push([0xBF594B]);
+    if (terrainHeight > 200) terrainColors.push([0xFF9A74]);
+    if (terrainHeight > 260) terrainColors.push([0xFFFFFF]);
 
     // $( '#wait' ).css( 'display', 'block' );
     // $( '#container' ).css( 'display', 'none' );
@@ -187,58 +202,69 @@ Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloud
 
     //
     // Planet
-    if(scene == 1) {
-        this.Planet = new Planet({
-            tile_width_x: 35,
-            tile_width_z: 35,
-            target_highest_point: 40,
-            color_map: [
-                [0x9EC457],
-                [0xD7D3D5],
-                [0xC7C3C5]
-            ],
-            bottom_color_map: [
-                [0x8A3E26],
-                [0x662A15],
-                [0x522717]
-            ]
-        });
-    } else if (scene == 2) {
-        this.Planet = new Planet({
-            tile_width_x: 35,
-            tile_width_z: 35,
-            target_highest_point: 100,
-            color_map: [
-                [0x9EC457],
-                [0xD3E17F],
-                [0xC7C3C5]
-            ],
-            bottom_color_map: [
-                [0x8A3E26],
-                [0x662A15],
-                [0x522717]
-            ]
-        });
-    } else {
-        this.Planet = new Planet({
-            tile_width_x: 35,
-            tile_width_z: 35,
-            target_highest_point: 260,
-            color_map: [
-                [0xFFFFFF],
-                [0xFF9A74],
-                [0xBF594B],
-                [0xD3E17F],
-                [0x9EC457],
-                [0xC7C3C5]
-            ],
-            bottom_color_map: [
-                [0x8A3E26],
-                [0x662A15],
-                [0x522717]
-            ]
-        });
-    }
+    this.Planet = new Planet({
+        tile_width_x: 35,
+        tile_width_z: 35,
+        target_highest_point: terrainHeight,
+        color_map: terrainColors,
+        bottom_color_map: [
+            [0x8A3E26],
+            [0x662A15],
+            [0x522717]
+        ]
+    });
+    // if(scene == 1) {
+    //     this.Planet = new Planet({
+    //         tile_width_x: 35,
+    //         tile_width_z: 35,
+    //         target_highest_point: 40,
+    //         color_map: [
+    //             [0xC7C3C5],
+    //             [0xD7D3D5],
+    //             [0x9EC457]
+    //         ],
+    //         bottom_color_map: [
+    //             [0x8A3E26],
+    //             [0x662A15],
+    //             [0x522717]
+    //         ]
+    //     });
+    // } else if (scene == 2) {
+    //     this.Planet = new Planet({
+    //         tile_width_x: 35,
+    //         tile_width_z: 35,
+    //         target_highest_point: 100,
+    //         color_map: [
+    //             [0xC7C3C5],
+    //             [0xD3E17F],
+    //             [0x9EC457]
+    //         ],
+    //         bottom_color_map: [
+    //             [0x8A3E26],
+    //             [0x662A15],
+    //             [0x522717]
+    //         ]
+    //     });
+    // } else {
+    //     this.Planet = new Planet({
+    //         tile_width_x: 35,
+    //         tile_width_z: 35,
+    //         target_highest_point: 260,
+    //         color_map: [
+    //             [0xC7C3C5],
+    //             [0x9EC457],
+    //             [0xD3E17F],
+    //             [0xBF594B],
+    //             [0xFF9A74],
+    //             [0xFFFFFF]
+    //         ],
+    //         bottom_color_map: [
+    //             [0x8A3E26],
+    //             [0x662A15],
+    //             [0x522717]
+    //         ]
+    //     });
+    // }
     //create surface and bottom points
     this.Planet.compute_surface_points();
 
@@ -255,62 +281,79 @@ Main.prototype.recreate = function( scene, texture, treeCount, houseCount, cloud
 
     //
     //Trees
-    var tree_height = 30;
-    if(scene == 1) {
-        this.tree_layer = new Trees( {
-            planet: this.Planet,
-            mean_tree_height: tree_height,
-            treeCount: treeCount,
-            treeColors: [0]
-        } );
-    } else if (scene == 2) {
-        this.tree_layer = new Trees( {
-            planet: this.Planet,
-            mean_tree_height: tree_height,
-            treeCount: treeCount,
-            treeColors: [0,1]
-        } );
-    } else {
-        this.tree_layer = new Trees( {
-            planet: this.Planet,
-            mean_tree_height: tree_height,
-            treeCount: treeCount,
-            treeColors: [3,4]
-        } );
-    }
+    if (treeColors.length > 0) {
 
-    var trees = this.tree_layer.draw();
-    trees.name = 'trees';
-    this.scene.add( trees );
+        var tree_height = 30;
+        this.tree_layer = new Trees({
+            planet: this.Planet,
+            mean_tree_height: tree_height,
+            treeCount: treeCount,
+            treeColors: treeColors
+        });
+
+        // if(scene == 1) {
+        //     this.tree_layer = new Trees( {
+        //         planet: this.Planet,
+        //         mean_tree_height: tree_height,
+        //         treeCount: treeCount,
+        //         treeColors: [3]
+        //     } );
+        // } else if (scene == 2) {
+        //     this.tree_layer = new Trees( {
+        //         planet: this.Planet,
+        //         mean_tree_height: tree_height,
+        //         treeCount: treeCount,
+        //         treeColors: [1,2]
+        //     } );
+        // } else {
+        //     this.tree_layer = new Trees( {
+        //         planet: this.Planet,
+        //         mean_tree_height: tree_height,
+        //         treeCount: treeCount,
+        //         treeColors: [2,3]
+        //     } );
+        // }
+
+        var trees = this.tree_layer.draw();
+        trees.name = 'trees';
+        this.scene.add(trees);
+    }
 
     //
     //Houses
     var house_height = 120;
-    if(scene == 1) {
-        this.house_layer = new Houses( {
-            planet: this.Planet,
-            house_height: house_height,
-            houseCount: houseCount,
-            texture: texture,
-            houseColors: [1,2]
-        } );
-    } else if (scene == 2) {
-        this.house_layer = new Houses( {
-            planet: this.Planet,
-            house_height: house_height,
-            houseCount: houseCount,
-            texture: texture,
-            houseColors: [2]
-        } );
-    } else {
-        this.house_layer = new Houses( {
-            planet: this.Planet,
-            house_height: house_height,
-            houseCount: houseCount,
-            texture: texture,
-            houseColors: [5]
-        } );
-    }
+    this.house_layer = new Houses( {
+        planet: this.Planet,
+        house_height: house_height,
+        houseCount: houseCount,
+        texture: texture,
+        houseColors: [0]
+    } );
+    // if(scene == 1) {
+    //     this.house_layer = new Houses( {
+    //         planet: this.Planet,
+    //         house_height: house_height,
+    //         houseCount: houseCount,
+    //         texture: texture,
+    //         houseColors: [0]
+    //     } );
+    // } else if (scene == 2) {
+    //     this.house_layer = new Houses( {
+    //         planet: this.Planet,
+    //         house_height: house_height,
+    //         houseCount: houseCount,
+    //         texture: texture,
+    //         houseColors: [0]
+    //     } );
+    // } else {
+    //     this.house_layer = new Houses( {
+    //         planet: this.Planet,
+    //         house_height: house_height,
+    //         houseCount: houseCount,
+    //         texture: texture,
+    //         houseColors: [0]
+    //     } );
+    // }
 
     var houses = this.house_layer.draw();
     houses.name = 'houses';
