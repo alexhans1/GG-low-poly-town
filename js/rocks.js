@@ -105,7 +105,7 @@ Rocks.prototype.placeRock = function (pos) {
     returnGroup.position.set(x,y,z);
 
 
-    TweenMax.to( returnGroup.position, 3, { y: returnGroup.position.y + 50, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 200, yoyo: true });
+    TweenMax.to( returnGroup.position, 3.5, { y: returnGroup.position.y + 50, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 200, yoyo: true });
     TweenMax.to( returnGroup.position, 3, { x: returnGroup.position.x + 20, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 200, yoyo: true });
     TweenMax.to( returnGroup.position, 3, { z: returnGroup.position.z + 20, ease: Power1.easeInOut, delay: 9*Math.random(), repeat: 200, yoyo: true });
 

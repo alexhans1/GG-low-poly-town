@@ -178,8 +178,6 @@ Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCoun
     if (terrainHeight > 200) terrainColors.push([0xFF9A74]);
     if (terrainHeight > 260) terrainColors.push([0xFFFFFF]);
 
-    // $( '#wait' ).css( 'display', 'block' );
-    // $( '#container' ).css( 'display', 'none' );
 
     // Ensure initiated
     if(!this.is_initiated) this.init();
@@ -191,9 +189,6 @@ Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCoun
     this.scene.remove( this.scene.getObjectByName( 'clouds' ) );
     this.scene.remove( this.scene.getObjectByName( 'rocks' ) );
 
-    // Clear existing world, if there is one. Don't want to reset the camera position, etc.
-    // this.scene.remove( this.scene.getObjectByName( 'land' ) );
-    // this.scene.remove( this.scene.getObjectByName( 'trees' ) );
 
     // Create new world
     // The elements of the scene have been divided into layers, just to help organise code. Inevitably, most layers
@@ -282,9 +277,6 @@ Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCoun
     var rocks = this.rock_layer.drawRocks();
     rocks.name = 'rocks';
     this.scene.add( rocks );
-
-    $( '#wait' ).css( 'display', 'none' );
-    $( '#container' ).css( 'display', 'block' );
 
     this.animate();
 };

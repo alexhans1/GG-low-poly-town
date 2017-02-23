@@ -3,9 +3,6 @@
     border: none;
     font-family: sans-serif;
     overflow: hidden;
-
-
-    display: block;
 }
 
 .demo-layout {
@@ -18,10 +15,6 @@ button {
     margin-left: 100px
 }
 
-#wait {
-    display: none;
-}
-
 .mdl-layout__drawer {
     width: 330px;
     left: -275px;
@@ -30,17 +23,24 @@ button {
 .mdl-layout__drawer.is-visible {
     left: 0;
 }
+
 #close {
     position: absolute;
     margin: 20px;
     right:    0;
     bottom:   0;
 }
+
 #load {
     position: absolute;
     margin: 10px;
     right:    0;
     bottom:   0;
+}
+
+#explanation {
+    width: 300px;
+    height: 200px;
 }
 
 h6 {
