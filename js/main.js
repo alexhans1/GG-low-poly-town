@@ -163,8 +163,6 @@ Main.prototype.update = function() {
 
 Main.prototype.recreate = function( terrainHeight, texture, treeCount, houseCount, cloudCount, rockCount ) {
 
-    // var terrainHeight = 200;
-
     var terrainColors = [];
     var treeColors = [];
     terrainColors.push([0xC7C3C5]);
