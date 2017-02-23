@@ -1,6 +1,8 @@
 # GG-low-poly-town
 Project for Generaive Art class of Beuth University of Applied Sciences 2016/17
 
+DEMO: http://debating.de/BDUDBdev/gg/world/index.html
+
 The range for the terrain height is 10 to 400.
 The range for the amounts of trees, houses, clouds and rocks is 0 to 1, representing the percentage that a given object is placed at a spot.
 
